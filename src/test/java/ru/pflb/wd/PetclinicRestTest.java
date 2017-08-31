@@ -19,58 +19,40 @@ public class PetclinicRestTest {
 
     private static final String BASE_URI = "http://localhost:9966/petclinic";
 
-    /**
-     * Должен возвращать JSON объект по фамилии уже существующего клиента.
-     */
-    public JSONObject findOwner(String lastName) {
-        JSONArray array = new JSONArray(given()
-                .contentType("application/json")
-                .accept("application/json")
-                .baseUri(BASE_URI)
-                .when()
-                .get("/api/owners")
-                .then()
-                // expect 2xx response code
-                .statusCode(both(greaterThanOrEqualTo(200)).and(lessThan(300)))
-                .extract().body().asString());
-
-        for(int n = 0; n < array.length(); n++) {
-            JSONObject object = array.getJSONObject(n);
-            if (lastName.equals(object.getString("lastName"))) {
-                return object;
-            }
-        }
-
-        throw new IllegalArgumentException("Владелец \"" + lastName + "\" не был найден");
-    }
-
     @Test
     public void shouldFindOwnerAndAddPet() {
 
-        JSONObject user = findOwner("Franklin");
+        // Генерируем рандомные данные (буквенные имя, фамилию, адрес, город и цифровой телефон)
+        String newFirstName = capitalize(RandomStringUtils.randomAlphabetic(6));
+        String newLastName = capitalize(RandomStringUtils.randomAlphabetic(10));
+        String newFullName = newFirstName + ' ' + newLastName; // Склеиваем имя с фамилией для последующей проверки
+        String newAddress = RandomStringUtils.randomAlphanumeric(14);
+        String newCity = capitalize(RandomStringUtils.randomAlphabetic(6));
+        String newTelephone = RandomStringUtils.randomNumeric(10);
 
-        String name = capitalize(RandomStringUtils.randomAlphabetic(5).toLowerCase());
-
+        // Составление тела запроса на добавление нового владельца
         JSONObject petJsonObj = new JSONObject()
                 .put("id", JSONObject.NULL)
-                .put("name", name)
-                .put("birthDate", LocalDate.now().minusDays(7).format(DateTimeFormatter.ofPattern("yyyy/MM/dd")))
-                .put("type", new JSONObject().put("id", 5).put("name", "bird"))
-                .put("owner", user);
+                .put("firstName", newFirstName)
+                .put("lastName", newLastName)
+                .put("address", newAddress)
+                .put("city", newCity)
+                .put("telephone", newTelephone);
 
-        Integer petId = given()
+        Integer nameId = given()
                 .contentType("application/json")
                 .body(petJsonObj.toString())
                 .baseUri(BASE_URI)
                 .when()
-                .post("/api/pets")
+                .post("/api/owners")
                 .then()
                 // expect 2xx response code
                 .statusCode(equalTo(201))
-                .body("name", equalTo(name))
+                // Проверка наличия нового пользователя
+                .body("firstName", equalTo(newFirstName))
                 .extract().path("id");
 
-        System.out.println("Добавлен питомец с id=\"" + petId + "\"");
+        System.out.println("Добавлен владелец с id=\"" + nameId + "\"");
 
         // http://localhost:9966/petclinic/api/owners/*/lastname/Franklin
 
