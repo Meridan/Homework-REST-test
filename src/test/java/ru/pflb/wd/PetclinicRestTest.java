@@ -25,7 +25,6 @@ public class PetclinicRestTest {
         // Генерируем рандомные данные (буквенные имя, фамилию, адрес, город и цифровой телефон)
         String newFirstName = capitalize(RandomStringUtils.randomAlphabetic(6));
         String newLastName = capitalize(RandomStringUtils.randomAlphabetic(10));
-        String newFullName = newFirstName + ' ' + newLastName; // Склеиваем имя с фамилией для последующей проверки
         String newAddress = RandomStringUtils.randomAlphanumeric(14);
         String newCity = capitalize(RandomStringUtils.randomAlphabetic(6));
         String newTelephone = RandomStringUtils.randomNumeric(10);
@@ -54,7 +53,6 @@ public class PetclinicRestTest {
 
         System.out.println("Добавлен владелец с id=\"" + nameId + "\"");
 
-        // http://localhost:9966/petclinic/api/owners/*/lastname/Franklin
-
+     
     }
 }
